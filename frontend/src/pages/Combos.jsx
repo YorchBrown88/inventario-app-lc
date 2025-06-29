@@ -21,23 +21,24 @@ function Combos() {
   };
 
   const eliminarCombo = async (id) => {
-    const confirmar = confirm("¿Estás seguro de eliminar este combo?");
-    if (!confirmar) return;
+  const confirmar = confirm("¿Estás seguro de eliminar este combo?");
+  if (!confirmar) return;
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/combos/${id}`, {
-        method: 'DELETE',
-      });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/combos/${id}`, {
+      method: 'DELETE',
+    });
 
-      if (!res.ok) throw new Error("Error al eliminar combo");
+    if (!res.ok) throw new Error("Error al eliminar combo");
 
-      // Refrescar la lista
-      cargarCombos();
-    } catch (error) {
-      console.error("❌ Error al eliminar combo:", error);
-      alert("No se pudo eliminar el combo");
-    }
-  };
+    // Refrescar la lista
+    cargarCombos();
+  } catch (error) {
+    console.error("❌ Error al eliminar combo:", error);
+    alert("No se pudo eliminar el combo");
+  }
+};
+
 
   return (
     <div>

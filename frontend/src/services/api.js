@@ -118,3 +118,15 @@ export const crearCombo = async (formData) => {
 
   return await res.json();
 };
+
+export const eliminarCombo = async (id) => {
+  const res = await fetch(`http://localhost:3000/api/combos/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al eliminar combo');
+  }
+
+  return await res.json();
+};

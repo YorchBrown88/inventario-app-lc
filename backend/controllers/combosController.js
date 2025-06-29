@@ -57,6 +57,58 @@ export const crearCombo = async (req, res) => {
   }
 };
 
+export const actualizarCombo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, descripcion, precioVenta, activo, productos } = req.body;
+
+    console.log("🛠 Actualizando combo:", id);
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
+    if (!productos) {
+      return res.status(400).json({ error: "Productos no enviados" });
+    }
+
+    let productosParsed;
+    try {
+      productosParsed = JSON.parse(productos);
+    } catch (error) {
+      console.error("❌ Error al parsear productos:", error);
+      return res.status(400).json({ error: "Formato inválido en productos" });
+    }
+
+    const productosFormateados = productosParsed.map(p => ({
+      producto: p.productoId,
+      cantidad: p.cantidad
+    }));
+
+    const combo = await Combo.findById(id);
+    if (!combo) {
+      return res.status(404).json({ error: "Combo no encontrado" });
+    }
+
+    combo.nombre = nombre;
+    combo.descripcion = descripcion;
+    combo.precioVenta = precioVenta;
+    combo.activo = activo === 'true' || activo === true;
+    combo.productos = productosFormateados;
+
+    if (req.file) {
+      combo.imagen = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
+    }
+
+    await combo.save();
+    res.json(combo);
+  } catch (error) {
+    console.error("❌ Error al actualizar combo:", error);
+    res.status(500).json({ error: "Error al actualizar el combo" });
+  }
+};
+
 export const obtenerCombos = async (req, res) => {
   try {
     const combos = await Combo.find().populate('productos.producto');
@@ -64,5 +116,16 @@ export const obtenerCombos = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener combos:', error);
     res.status(500).json({ error: 'Error al obtener los combos' });
+  }
+};
+
+export const eliminarCombo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Combo.findByIdAndDelete(id);
+    res.json({ mensaje: 'Combo eliminado correctamente' });
+  } catch (error) {
+    console.error('❌ Error al eliminar combo:', error);
+    res.status(500).json({ mensaje: 'Error al eliminar combo' });
   }
 };

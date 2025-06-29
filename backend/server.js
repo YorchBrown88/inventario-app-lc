@@ -22,6 +22,7 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
 
+
 // Rutas
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/insumos', insumosRoutes);

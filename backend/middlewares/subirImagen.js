@@ -9,7 +9,6 @@ const __dirname = dirname(__filename);
 
 // Carpeta destino
 const storage = multer.memoryStorage(); // Para guardar la imagen en memoria (no en disco)
-
 const upload = multer({ storage });
 
 export default upload;
