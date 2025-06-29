@@ -1,4 +1,5 @@
 // src/services/api.js
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const obtenerInsumos = async () => {
   const res = await fetch('http://localhost:3000/api/insumos');
@@ -96,7 +97,7 @@ export async function eliminarProducto(id) {
 
 export async function obtenerCombos() {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/combos`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/combos`);
     if (!response.ok) throw new Error('Error al obtener combos');
     return await response.json();
   } catch (error) {
@@ -104,3 +105,16 @@ export async function obtenerCombos() {
     throw error;
   }
 }
+
+export const crearCombo = async (formData) => {
+  const res = await fetch(`${API_URL}/api/combos`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al crear combo');
+  }
+
+  return await res.json();
+};

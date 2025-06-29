@@ -1,8 +1,8 @@
-const Insumo = require('../models/Insumo');
-const Producto = require('../models/Producto');
-const Venta = require('../models/Venta');
+import Insumo from '../models/Insumo.js';
+import Producto from '../models/Producto.js';
+import Venta from '../models/Venta.js';
 
-exports.stockBajo = async (req, res) => {
+export const stockBajo = async (req, res) => {
   try {
     const insumos = await Insumo.find({ cantidad: { $lt: 50 } });
     res.json(insumos);
@@ -11,13 +11,16 @@ exports.stockBajo = async (req, res) => {
   }
 };
 
-exports.topProductosVendidos = async (req, res) => {
+export const topProductosVendidos = async (req, res) => {
   try {
     const ventas = await Venta.aggregate([
       {
+        $unwind: "$productos"
+      },
+      {
         $group: {
-          _id: '$producto',
-          totalVendidas: { $sum: '$cantidadVendida' }
+          _id: "$productos.producto",
+          totalVendidas: { $sum: "$productos.cantidad" }
         }
       },
       {
@@ -42,29 +45,35 @@ exports.topProductosVendidos = async (req, res) => {
   }
 };
 
-exports.consumoInsumos = async (req, res) => {
+export const consumoInsumos = async (req, res) => {
   try {
     const ventas = await Venta.find().populate({
-      path: 'producto',
+      path: 'productos.producto',
       populate: { path: 'insumos.insumo' }
     });
 
     const consumo = {};
 
     ventas.forEach(venta => {
-      venta.producto.insumos.forEach(item => {
-        const id = item.insumo._id;
-        const nombre = item.insumo.nombre;
-        const total = item.cantidad * venta.cantidadVendida;
+      venta.productos.forEach(({ producto, cantidad }) => {
+        if (!producto || !producto.insumos) return;
 
-        if (!consumo[id]) {
-          consumo[id] = {
-            nombre,
-            cantidadConsumida: 0
-          };
-        }
+        producto.insumos.forEach(({ insumo, cantidad: cantidadInsumo }) => {
+          if (!insumo) return;
 
-        consumo[id].cantidadConsumida += total;
+          const id = insumo._id;
+          const nombre = insumo.nombre;
+          const total = cantidadInsumo * cantidad;
+
+          if (!consumo[id]) {
+            consumo[id] = {
+              nombre,
+              cantidadConsumida: 0
+            };
+          }
+
+          consumo[id].cantidadConsumida += total;
+        });
       });
     });
 
@@ -74,25 +83,23 @@ exports.consumoInsumos = async (req, res) => {
   }
 };
 
-exports.obtenerReportes = async (req, res) => {
+export const obtenerReportes = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, producto } = req.query;
 
     const filtro = {};
 
-    // Filtrar por fecha (si hay rango de fechas)
     if (fechaInicio || fechaFin) {
       filtro.fecha = {};
       if (fechaInicio) filtro.fecha.$gte = new Date(fechaInicio);
       if (fechaFin) filtro.fecha.$lte = new Date(fechaFin);
     }
 
-    // Filtrar por producto
     if (producto) {
-      filtro.producto = producto;
+      filtro["productos.producto"] = producto;
     }
 
-    const ventas = await Venta.find(filtro).populate('producto');
+    const ventas = await Venta.find(filtro).populate('productos.producto');
 
     res.json(ventas);
   } catch (error) {
@@ -101,16 +108,18 @@ exports.obtenerReportes = async (req, res) => {
   }
 };
 
-exports.reporteVentas = async (req, res) => {
+export const reporteVentas = async (req, res) => {
   try {
-    const ventas = await Venta.find().populate('producto');
+    const ventas = await Venta.find().populate('productos.producto');
 
-    const reporte = ventas.map(v => ({
-      producto: v.producto?.nombre || 'Producto eliminado',
-      cantidadVendida: v.cantidadVendida,
-      total: v.cantidadVendida * (v.producto?.precio || 0),
-      fecha: v.fecha
-    }));
+    const reporte = ventas.flatMap(v =>
+      v.productos.map(p => ({
+        producto: p.producto?.nombre || 'Producto eliminado',
+        cantidadVendida: p.cantidad,
+        total: p.cantidad * (p.producto?.precio || 0),
+        fecha: v.fecha
+      }))
+    );
 
     res.json(reporte);
   } catch (error) {
@@ -119,10 +128,10 @@ exports.reporteVentas = async (req, res) => {
   }
 };
 
-const obtenerReporteVentas = async (req, res) => {
+export const obtenerReporteVentas = async (req, res) => {
   try {
-    const ventas = await Venta.find({ estado: 'completado' }) // Solo ventas completadas
-      .sort({ createdAt: -1 }) // Las más recientes primero
+    const ventas = await Venta.find({ estado: 'completado' })
+      .sort({ createdAt: -1 })
       .populate('cliente', 'nombre cedula')
       .populate('productos.producto', 'nombre precio');
 
@@ -131,8 +140,4 @@ const obtenerReporteVentas = async (req, res) => {
     console.error('❌ Error al generar el reporte:', error.message);
     res.status(500).json({ mensaje: 'Error al generar el reporte' });
   }
-};
-
-module.exports = {
-  obtenerReporteVentas
 };

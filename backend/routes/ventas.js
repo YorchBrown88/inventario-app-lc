@@ -1,25 +1,25 @@
-const express = require('express');
-const router = express.Router();
-const Venta = require('../models/Venta'); // <- ESTA ES LA LÍNEA CLAVE
-
-const {
+import express from 'express';
+import Venta from '../models/venta.js';
+import {
   registrarVenta,
   obtenerVentasEnCurso,
   obtenerVentaPorId,
   registrarPago,
-  registrarPagoParcial, // ✅ Asegúrate de importar esta también
+  registrarPagoParcial,
   completarVenta,
   obtenerPedidosCompletados
-} = require('../controllers/ventasController');
+} from '../controllers/ventasController.js';
 
-// ✅ Rutas de ventas
+const router = express.Router();
+
 router.post('/', registrarVenta);
 router.get('/en-curso', obtenerVentasEnCurso);
 router.get('/completados', obtenerPedidosCompletados);
 router.get('/:id', obtenerVentaPorId);
 router.put('/:id/pagar', registrarPago);
 router.put('/:id/completar', completarVenta);
-router.put('/:id/pago-parcial', registrarPagoParcial); // ✅ Nueva ruta
+router.put('/:id/pago-parcial', registrarPagoParcial);
+
 router.get('/cliente/:id', async (req, res) => {
   const { id } = req.params;
   const { desde, hasta } = req.query;
@@ -39,5 +39,4 @@ router.get('/cliente/:id', async (req, res) => {
   res.json(ventas);
 });
 
-module.exports = router;
-
+export default router;

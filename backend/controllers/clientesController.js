@@ -1,12 +1,11 @@
-const Cliente = require('../models/Cliente');
+import Cliente from '../models/Cliente.js';
 
-
-const obtenerClientes = async (req, res) => {
+export const obtenerClientes = async (req, res) => {
   const clientes = await Cliente.find().sort({ createdAt: -1 });
   res.json(clientes);
 };
 
-const crearCliente = async (req, res) => {
+export const crearCliente = async (req, res) => {
   try {
     const nuevoCliente = new Cliente(req.body);
     await nuevoCliente.save();
@@ -19,18 +18,17 @@ const crearCliente = async (req, res) => {
   }
 };
 
-
-const actualizarCliente = async (req, res) => {
+export const actualizarCliente = async (req, res) => {
   const actualizado = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(actualizado);
 };
 
-const eliminarCliente = async (req, res) => {
+export const eliminarCliente = async (req, res) => {
   await Cliente.findByIdAndDelete(req.params.id);
   res.json({ mensaje: 'Cliente eliminado' });
 };
 
-const obtenerClientePorCedula = async (req, res) => {
+export const obtenerClientePorCedula = async (req, res) => {
   const { cedula } = req.params;
   const cliente = await Cliente.findOne({ cedula });
   if (!cliente) {
@@ -39,7 +37,7 @@ const obtenerClientePorCedula = async (req, res) => {
   res.json(cliente);
 };
 
-const obtenerClientePorId = async (req, res) => {
+export const obtenerClientePorId = async (req, res) => {
   try {
     const cliente = await Cliente.findById(req.params.id);
     if (!cliente) {
@@ -49,14 +47,4 @@ const obtenerClientePorId = async (req, res) => {
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al obtener cliente', error });
   }
-};
-
-
-module.exports = {
-  obtenerClientes,
-  crearCliente,
-  actualizarCliente,
-  eliminarCliente,
-  obtenerClientePorCedula,
-  obtenerClientePorId
 };

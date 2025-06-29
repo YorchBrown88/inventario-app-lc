@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: true }));
 
 // Rutas
 app.use('/api/clientes', clientesRoutes);
@@ -28,7 +29,8 @@ app.use('/api/productos', productosRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/reportes', reportesRoutes);
-app.use('/combos', combosRoutes);
+app.use('/api/combos', combosRoutes);
+
 
 // MongoDB y servidor
 mongoose.connect(process.env.MONGO_URI)

@@ -8,7 +8,6 @@ import {
 
 const router = express.Router();
 
-// Rutas
 router.get('/', obtenerInsumos);
 router.post('/', crearInsumo);
 router.put('/:id', actualizarInsumo);

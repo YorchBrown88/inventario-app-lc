@@ -2,16 +2,27 @@ import mongoose from 'mongoose';
 
 const comboSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  imagen: { type: String },
-  precioVenta: { type: Number, required: true },
+  descripcion: { type: String },
   productos: [
     {
-      producto: { type: mongoose.Schema.Types.ObjectId, ref: 'Producto' },
-      cantidad: Number,
+      producto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Producto',
+        required: true
+      },
+      cantidad: {
+        type: Number,
+        required: true
+      }
     }
   ],
-  activo: { type: Boolean, default: true }
-}, { timestamps: true });
+  precioVenta: { type: Number, required: true },
+  activo: { type: Boolean, default: true },
+  imagen: {
+    data: Buffer,
+    contentType: String
+  }
+});
 
-const Combo = mongoose.model('Combo', comboSchema);
-export default Combo; // ✅ esto es clave para usar 'import Combo from ...'
+const Combo = mongoose.models.Combo || mongoose.model('Combo', comboSchema);
+export default Combo;

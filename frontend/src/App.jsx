@@ -16,8 +16,7 @@ import PedidoDetalle from "./pages/PedidoDetalle";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Combos from './pages/Combos';
-
-
+import CrearCombo from "./pages/CrearCombo";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,6 +36,7 @@ function App() {
             <Route path="/clientes/:id" element={<ClienteDetalle />} />
             <Route path="/productos" element={<Productos />} />
             <Route path="/combos" element={<Combos />} />
+            <Route path="/crear-combo" element={<CrearCombo />} />
             <Route path="/crear-producto" element={<CrearProducto />} />
             <Route path="/movimientos" element={<Movimientos />} />
             <Route path="/ventas" element={<Ventas />} />

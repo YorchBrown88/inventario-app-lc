@@ -1,9 +1,7 @@
-// backend/controllers/movimientosController.js
+import Movimiento from '../models/Movimiento.js';
+import Insumo from '../models/Insumo.js';
 
-const Movimiento = require('../models/Movimiento');
-const Insumo = require('../models/Insumo');
-
-const obtenerMovimientos = async (req, res) => {
+export const obtenerMovimientos = async (req, res) => {
   try {
     const { insumo, desde, hasta } = req.query;
     const filtro = {};
@@ -31,7 +29,7 @@ const obtenerMovimientos = async (req, res) => {
   }
 };
 
-const crearMovimiento = async (req, res) => {
+export const crearMovimiento = async (req, res) => {
   try {
     const { insumo, tipo, cantidad } = req.body;
 
@@ -53,7 +51,6 @@ const crearMovimiento = async (req, res) => {
 
     await movimiento.save();
 
-    // Actualizar stock
     insumoExistente.cantidad =
       tipo === "entrada"
         ? insumoExistente.cantidad + parseFloat(cantidad)
@@ -66,9 +63,4 @@ const crearMovimiento = async (req, res) => {
     console.error("Error al registrar movimiento:", err);
     res.status(500).json({ error: "Error del servidor" });
   }
-};
-
-module.exports = {
-  obtenerMovimientos,
-  crearMovimiento,
 };

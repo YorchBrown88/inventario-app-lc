@@ -1,9 +1,10 @@
-// backend/routes/combos.js
 import express from 'express';
-import { obtenerCombos } from '../controllers/combosController.js';
+import upload from '../middlewares/subirImagen.js';
+import { crearCombo, obtenerCombos } from '../controllers/combosController.js';
 
 const router = express.Router();
 
-router.get('/', obtenerCombos); // Ruta para listar combos
+router.post('/', upload.single('imagen'), crearCombo);
+router.get('/', obtenerCombos);
 
 export default router;

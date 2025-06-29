@@ -5,7 +5,7 @@ import {
   crearCliente,
   actualizarCliente,
   eliminarCliente,
-  obtenerClientePorCedula
+  obtenerClientePorCedula,
 } from '../controllers/clientesController.js';
 
 const router = express.Router();
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
 // Buscar por cédula
 router.get('/cedula/:cedula', obtenerClientePorCedula);
 
-// Obtener cliente por ID (individual)
+// Obtener cliente por ID
 router.get('/:id', async (req, res) => {
   try {
     const cliente = await Cliente.findById(req.params.id);

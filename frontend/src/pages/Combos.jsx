@@ -1,18 +1,43 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { obtenerCombos } from '../services/api';
 
 function Combos() {
   const [combos, setCombos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    obtenerCombos()
-      .then(setCombos)
-      .catch(err => {
-        console.error("Error al cargar combos:", err);
-        setCombos([]);
-      });
+    cargarCombos();
   }, []);
+
+  const cargarCombos = async () => {
+    try {
+      const data = await obtenerCombos();
+      setCombos(data);
+    } catch (err) {
+      console.error("Error al cargar combos:", err);
+      setCombos([]);
+    }
+  };
+
+  const eliminarCombo = async (id) => {
+    const confirmar = confirm("¿Estás seguro de eliminar este combo?");
+    if (!confirmar) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/combos/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error("Error al eliminar combo");
+
+      // Refrescar la lista
+      cargarCombos();
+    } catch (error) {
+      console.error("❌ Error al eliminar combo:", error);
+      alert("No se pudo eliminar el combo");
+    }
+  };
 
   return (
     <div>
@@ -48,9 +73,27 @@ function Combos() {
                     {combo.activo ? "✅ Activo" : "❌ Inactivo"}
                   </td>
                   <td className="p-2 border text-center space-x-2">
-                    <button className="text-blue-600 hover:text-blue-800" title="Ver">🔍</button>
-                    <button className="text-yellow-600 hover:text-yellow-800" title="Editar">✏️</button>
-                    <button className="text-red-600 hover:text-red-800" title="Eliminar">🗑️</button>
+                    <button
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Ver"
+                      onClick={() => navigate(`/combos/${combo._id}`)}
+                    >
+                      🔍
+                    </button>
+                    <button
+                      className="text-yellow-600 hover:text-yellow-800"
+                      title="Editar"
+                      onClick={() => navigate(`/editar-combo/${combo._id}`)}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      title="Eliminar"
+                      onClick={() => eliminarCombo(combo._id)}
+                    >
+                      🗑️
+                    </button>
                   </td>
                 </tr>
               ))}

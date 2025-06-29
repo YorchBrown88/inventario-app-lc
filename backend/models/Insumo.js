@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const insumoSchema = new mongoose.Schema({
   nombre: {
@@ -22,4 +22,5 @@ const insumoSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Insumo', insumoSchema);
+const Insumo = mongoose.model('Insumo', insumoSchema);
+export default Insumo;

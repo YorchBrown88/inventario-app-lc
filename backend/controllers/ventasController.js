@@ -1,11 +1,8 @@
-const Venta = require('../models/Venta');
-const Cliente = require('../models/Cliente');
+import Venta from '../models/venta.js';
+import Cliente from '../models/cliente.js';
 
-// Crear nueva venta
-const registrarVenta = async (req, res) => {
+export const registrarVenta = async (req, res) => {
   try {
-    console.log("📦 Datos recibidos:", req.body);
-
     const {
       cedula,
       productos,
@@ -16,16 +13,12 @@ const registrarVenta = async (req, res) => {
       total
     } = req.body;
 
-
     if (!cedula || !productos || productos.length === 0) {
       return res.status(400).json({ mensaje: 'Datos incompletos para registrar venta' });
     }
 
-    // Buscar cliente por cédula
     const cliente = await Cliente.findOne({ cedula });
-    if (!cliente) {
-      return res.status(404).json({ mensaje: 'Cliente no encontrado' });
-    }
+    if (!cliente) return res.status(404).json({ mensaje: 'Cliente no encontrado' });
 
     const nuevaVenta = new Venta({
       cliente: cliente._id,
@@ -47,9 +40,7 @@ const registrarVenta = async (req, res) => {
   }
 };
 
-
-// Obtener ventas en curso
-const obtenerVentasEnCurso = async (req, res) => {
+export const obtenerVentasEnCurso = async (req, res) => {
   try {
     const ventas = await Venta.find({ estado: 'en_curso' }).populate('cliente');
     res.json(ventas);
@@ -58,8 +49,7 @@ const obtenerVentasEnCurso = async (req, res) => {
   }
 };
 
-// Obtener pedidos completados
-const obtenerPedidosCompletados = async (req, res) => {
+export const obtenerPedidosCompletados = async (req, res) => {
   try {
     const ventas = await Venta.find({ estado: 'completado' }).populate('cliente');
     res.json(ventas);
@@ -68,18 +58,12 @@ const obtenerPedidosCompletados = async (req, res) => {
   }
 };
 
-// Obtener venta por ID
-const obtenerVentaPorId = async (req, res) => {
+export const obtenerVentaPorId = async (req, res) => {
   try {
     const { id } = req.params;
+    const venta = await Venta.findById(id).populate('cliente').populate('productos.producto');
 
-    const venta = await Venta.findById(id)
-      .populate('cliente')
-      .populate('productos.producto');
-
-    if (!venta) {
-      return res.status(404).json({ mensaje: 'Venta no encontrada' });
-    }
+    if (!venta) return res.status(404).json({ mensaje: 'Venta no encontrada' });
 
     const ventaFormateada = {
       _id: venta._id,
@@ -87,10 +71,10 @@ const obtenerVentaPorId = async (req, res) => {
       fecha: venta.fecha,
       total: venta.total,
       observacion: venta.observacion,
-      productos: venta.productos.map((p) => ({
+      productos: venta.productos.map(p => ({
         producto: p.producto,
         cantidad: p.cantidad,
-        precioUnitario: p.precioUnitario,
+        precioUnitario: p.precioUnitario
       })),
       pagos: venta.pagos,
       subtotal: venta.subtotal,
@@ -106,8 +90,7 @@ const obtenerVentaPorId = async (req, res) => {
   }
 };
 
-// Pago completo
-const registrarPago = async (req, res) => {
+export const registrarPago = async (req, res) => {
   try {
     const venta = await Venta.findById(req.params.id);
     if (!venta) return res.status(404).json({ mensaje: 'Venta no encontrada' });
@@ -123,8 +106,7 @@ const registrarPago = async (req, res) => {
   }
 };
 
-// Pago parcial
-const registrarPagoParcial = async (req, res) => {
+export const registrarPagoParcial = async (req, res) => {
   try {
     const venta = await Venta.findById(req.params.id);
     if (!venta) return res.status(404).json({ mensaje: 'Venta no encontrada' });
@@ -144,8 +126,7 @@ const registrarPagoParcial = async (req, res) => {
   }
 };
 
-// Completar venta (sin registrar pago)
-const completarVenta = async (req, res) => {
+export const completarVenta = async (req, res) => {
   try {
     const venta = await Venta.findById(req.params.id);
     if (!venta) return res.status(404).json({ mensaje: 'Venta no encontrada' });
@@ -157,15 +138,4 @@ const completarVenta = async (req, res) => {
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al completar venta' });
   }
-};
-
-// Exportar todos los controladores
-module.exports = {
-  registrarVenta,
-  obtenerVentasEnCurso,
-  obtenerVentaPorId,
-  registrarPago,
-  registrarPagoParcial,
-  completarVenta,
-  obtenerPedidosCompletados
 };
