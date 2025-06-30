@@ -1,9 +1,9 @@
 import express from 'express';
-import { obtenerMovimientos, crearMovimiento } from '../controllers/movimientosController.js';
+import { obtenerMovimientos, registrarMovimiento } from '../controllers/movimientosController.js';
 
 const router = express.Router();
 
 router.get('/', obtenerMovimientos);
-router.post('/', crearMovimiento);
+router.post('/', registrarMovimiento);
 
 export default router;

@@ -29,11 +29,11 @@ export const obtenerMovimientos = async (req, res) => {
   }
 };
 
-export const crearMovimiento = async (req, res) => {
+export const registrarMovimiento = async (req, res) => {
   try {
-    const { insumo, tipo, cantidad } = req.body;
+    const { insumo, tipo, cantidad, motivo } = req.body;
 
-    if (!insumo || !tipo || !cantidad) {
+    if (!insumo || !tipo || !cantidad || !motivo) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -42,20 +42,27 @@ export const crearMovimiento = async (req, res) => {
       return res.status(404).json({ error: "Insumo no encontrado" });
     }
 
+    const stockAnterior = insumoExistente.cantidad;
+    const cantidadFloat = parseFloat(cantidad);
+
+    const stockFinal =
+      tipo === "entrada"
+        ? stockAnterior + cantidadFloat
+        : stockAnterior - cantidadFloat;
+
     const movimiento = new Movimiento({
       insumo,
       tipo,
-      cantidad,
+      cantidad: cantidadFloat,
+      motivo,
+      stockAnterior,
+      stockFinal,
       fecha: new Date(),
     });
 
     await movimiento.save();
 
-    insumoExistente.cantidad =
-      tipo === "entrada"
-        ? insumoExistente.cantidad + parseFloat(cantidad)
-        : insumoExistente.cantidad - parseFloat(cantidad);
-
+    insumoExistente.cantidad = stockFinal;
     await insumoExistente.save();
 
     res.status(201).json(movimiento);
