@@ -69,13 +69,11 @@ function Productos() {
               <td className="p-2 border">{producto.nombre}</td>
               <td className="p-2 border text-center">${producto.precioVenta?.toFixed(2)}</td>
               <td className="p-2 border text-center space-x-2">
-                <button
-                  title="Ver"
-                  className="text-blue-600 hover:text-blue-800"
-                  onClick={() => console.log('Ver', producto)}
-                >
-                  🔍
-                </button>
+                <Link
+                  to={`/productos/${producto._id}`}
+                  title="Ver">🔍
+                </Link>
+
                 <Link
                   to={`/editar-producto/${producto._id}`}
                   title="Editar"

@@ -1,8 +1,15 @@
-import Cliente from '../models/Cliente.js';
+import Cliente from '../models/cliente.js';
 
 export const obtenerClientes = async (req, res) => {
-  const clientes = await Cliente.find().sort({ createdAt: -1 });
-  res.json(clientes);
+  try {
+    const mostrarInactivos = req.query.todos === 'true';
+    const filtro = mostrarInactivos ? {} : { activo: true };
+
+    const clientes = await Cliente.find(filtro);
+    res.json(clientes);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener clientes' });
+  }
 };
 
 export const crearCliente = async (req, res) => {
@@ -19,22 +26,33 @@ export const crearCliente = async (req, res) => {
 };
 
 export const actualizarCliente = async (req, res) => {
-  const actualizado = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(actualizado);
+  try {
+    const actualizado = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!actualizado) {
+      return res.status(404).json({ mensaje: 'Cliente no encontrado' });
+    }
+    res.json(actualizado);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar cliente' });
+  }
 };
 
 export const eliminarCliente = async (req, res) => {
-  await Cliente.findByIdAndDelete(req.params.id);
-  res.json({ mensaje: 'Cliente eliminado' });
-};
+  try {
+    const cliente = await Cliente.findByIdAndUpdate(
+      req.params.id,
+      { activo: false },
+      { new: true }
+    );
 
-export const obtenerClientePorCedula = async (req, res) => {
-  const { cedula } = req.params;
-  const cliente = await Cliente.findOne({ cedula });
-  if (!cliente) {
-    return res.status(404).json({ mensaje: 'Cliente no encontrado' });
+    if (!cliente) {
+      return res.status(404).json({ mensaje: 'Cliente no encontrado' });
+    }
+
+    res.json({ mensaje: 'Cliente desactivado correctamente' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar cliente' });
   }
-  res.json(cliente);
 };
 
 export const obtenerClientePorId = async (req, res) => {
@@ -46,5 +64,17 @@ export const obtenerClientePorId = async (req, res) => {
     res.json(cliente);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al obtener cliente', error });
+  }
+};
+
+export const obtenerClientePorCedula = async (req, res) => {
+  try {
+    const cliente = await Cliente.findOne({ cedula: req.params.cedula });
+    if (!cliente) {
+      return res.status(404).json({ mensaje: 'Cliente no encontrado' });
+    }
+    res.json(cliente);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al buscar cliente por cédula', error });
   }
 };

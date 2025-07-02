@@ -15,10 +15,10 @@ const Sidebar = ({ isSidebarOpen, closeSidebar }) => {
 
   const links = [
     { to: "/", icon: <FaBoxOpen />, label: "Insumos" },
+    { to: "/movimientos", icon: <FaExchangeAlt />, label: "Movimientos" },
     { to: "/clientes", icon: <FaUsers />, label: "Clientes" },
     { to: "/productos", icon: <FaPlusSquare />, label: "Productos" },
     { to: "/combos", icon: <FaLayerGroup />, label: "Combos" },
-    { to: "/movimientos", icon: <FaExchangeAlt />, label: "Movimientos" },
     { to: "/ventas", icon: <FaReceipt />, label: "Ventas" },
     { to: "/pedidos-en-curso", icon: <FaClipboardList />, label: "Pedidos en Curso" },
     { to: "/pedidos-completados", icon: <FaClipboardList />, label: "Pedidos Completados" },

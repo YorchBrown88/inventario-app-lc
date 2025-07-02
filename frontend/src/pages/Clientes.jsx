@@ -9,21 +9,22 @@ const Clientes = () => {
   const [mensaje, setMensaje] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    cargarClientes();
-  }, []);
+    const cargarClientes = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes?todos=${mostrarInactivos}`);
+        const data = await res.json();
+        setClientes(data);
+      } catch (err) {
+        setMensaje('❌ Error cargando clientes');
+      }
+    };
 
-  const cargarClientes = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/api/clientes');
-      const data = await res.json();
-      setClientes(data);
-    } catch (err) {
-      setMensaje('❌ Error cargando clientes');
-    }
-  };
+    cargarClientes();
+  }, [mostrarInactivos]);
 
   const manejarCambio = (e) => {
     setCliente({ ...cliente, [e.target.name]: e.target.value });
@@ -38,8 +39,8 @@ const Clientes = () => {
     }
 
     const url = editandoId
-      ? `http://localhost:3000/api/clientes/${editandoId}`
-      : 'http://localhost:3000/api/clientes';
+      ? `${import.meta.env.VITE_API_URL}/api/clientes/${editandoId}`
+      : `${import.meta.env.VITE_API_URL}/api/clientes`;
     const metodo = editandoId ? 'PUT' : 'POST';
 
     try {
@@ -59,7 +60,7 @@ const Clientes = () => {
       setCliente({ nombre: '', cedula: '', correo: '', telefono: '', direccion: '' });
       setEditandoId(null);
       setMostrarFormulario(false);
-      cargarClientes();
+      setMostrarInactivos(false); // recarga solo los activos después de guardar
     } catch (error) {
       setMensaje('❌ Error de conexión con el servidor');
     }
@@ -74,13 +75,35 @@ const Clientes = () => {
   const manejarEliminar = async (id) => {
     if (confirm('¿Seguro que deseas eliminar este cliente?')) {
       try {
-        await fetch(`http://localhost:3000/api/clientes/${id}`, { method: 'DELETE' });
-        cargarClientes();
+        await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`, { method: 'DELETE' });
+        setMostrarInactivos(false);
       } catch (error) {
         setMensaje('❌ Error al eliminar cliente');
       }
     }
   };
+
+  const toggleActivo = async (id, estadoActual) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activo: !estadoActual })
+    });
+
+    if (!res.ok) {
+      setMensaje('❌ No se pudo cambiar el estado');
+      return;
+    }
+
+    setMensaje(`✅ Cliente ${estadoActual ? 'inactivado' : 'activado'}`);
+    setTimeout(() => setMensaje(''), 2000);
+    cargarClientes();
+  } catch (error) {
+    setMensaje('❌ Error de conexión con el servidor');
+  }
+};
+
 
   const normalizar = (texto) =>
     texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -108,13 +131,19 @@ const Clientes = () => {
         {mostrarFormulario ? 'Cancelar' : '➕ Agregar nuevo cliente'}
       </button>
 
+      <button
+        onClick={() => setMostrarInactivos(!mostrarInactivos)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
+      >
+        {mostrarInactivos ? 'Ocultar Inactivos' : 'Mostrar Inactivos'}
+      </button>
+
       {mostrarFormulario && (
         <form
           onSubmit={manejarEnvio}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 border p-4 rounded shadow bg-gray-50"
         >
-          {[
-            { label: 'Nombre', name: 'nombre', required: true },
+          {[{ label: 'Nombre', name: 'nombre', required: true },
             { label: 'Cédula', name: 'cedula', required: true },
             { label: 'Correo', name: 'correo', type: 'email' },
             { label: 'Teléfono', name: 'telefono' },
@@ -159,7 +188,10 @@ const Clientes = () => {
           </tr>
         </thead>
         <tbody>
-          {clientesFiltrados.map((cli) => (
+
+          {clientesFiltrados
+          .filter((cli) => cli.activo === !mostrarInactivos) // filtra por activos o inactivos según el botón
+          .map((cli) => (
             <tr key={cli._id} className="border-t text-center">
               <td className="p-2 text-left">{cli.nombre}</td>
               <td className="p-2">{ocultarCedula(cli.cedula)}</td>
@@ -172,13 +204,18 @@ const Clientes = () => {
                   <button onClick={() => manejarEditar(cli)} className="text-yellow-500">
                     <FaEdit />
                   </button>
-                  <button onClick={() => manejarEliminar(cli._id)} className="text-red-600">
-                    <FaTrash />
+                  <button
+                    onClick={() => toggleActivo(cli._id, cli.activo)}
+                    className={cli.activo ? 'text-red-600' : 'text-green-600'}
+                    title={cli.activo ? 'Inactivar' : 'Activar'}
+                  >
+                    {cli.activo ? '❌' : '✅'}
                   </button>
                 </div>
               </td>
             </tr>
-          ))}
+        ))}
+
         </tbody>
       </table>
     </div>

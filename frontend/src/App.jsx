@@ -19,7 +19,8 @@ import Combos from './pages/Combos';
 import CrearCombo from "./pages/CrearCombo";
 import EditarCombo from './pages/EditarCombo'; // ajusta el path si es necesario
 import ComboDetalle from './pages/ComboDetalle';
-
+import VerProducto from './pages/VerProducto';
+import EditarProducto from './pages/EditarProducto'; // o el path real
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -38,6 +39,8 @@ function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/clientes/:id" element={<ClienteDetalle />} />
             <Route path="/productos" element={<Productos />} />
+            <Route path="/productos/:id" element={<VerProducto />} />
+            <Route path="/editar-producto/:id" element={<EditarProducto />} />
             <Route path="/combos" element={<Combos />} />
             <Route path="/crear-combo" element={<CrearCombo />} />
             <Route path="/editar-combo/:id" element={<EditarCombo />} />

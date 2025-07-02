@@ -57,26 +57,41 @@ export const crearProducto = async (req, res) => {
   }
 };
 
+
 export const actualizarProducto = async (req, res) => {
   try {
-    const { nombre, insumos, precioVenta } = req.body;
+    const { nombre, insumos, precioVenta, descripcion, activo } = req.body;
 
+    const insumosParsed = JSON.parse(insumos);
+
+    // Validar y transformar insumos
+    const insumosTransformados = insumosParsed
+      .filter(item => item.insumoId && item.cantidad > 0)
+      .map(item => ({
+        insumo: item.insumoId,
+        cantidad: item.cantidad
+      }));
+
+    // Calcular precio de producción
     let precioProduccion = 0;
-    for (const item of JSON.parse(insumos)) {
-      const insumo = await Insumo.findById(item.insumoId);
+    for (const item of insumosTransformados) {
+      const insumo = await Insumo.findById(item.insumo);
       if (insumo) {
         precioProduccion += insumo.costoUnitario * item.cantidad;
       }
     }
 
+    // Actualización
     const productoActualizado = await Producto.findByIdAndUpdate(
       req.params.id,
       {
         nombre,
-        insumos: JSON.parse(insumos),
+        descripcion,
+        activo: activo === 'true' || activo === true,
+        insumos: insumosTransformados,
         precioVenta,
         precioProduccion,
-        imagen: req.file ? req.file.filename : undefined,
+        ...(req.file && { imagen: req.file.filename })
       },
       { new: true }
     );
@@ -87,6 +102,7 @@ export const actualizarProducto = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al actualizar el producto' });
   }
 };
+
 
 export const eliminarProducto = async (req, res) => {
   try {
