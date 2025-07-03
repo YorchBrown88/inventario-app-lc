@@ -1,4 +1,5 @@
 import express from 'express';
+import { actualizarFavoritoCombo } from '../controllers/combosController.js';
 
 import {
   crearCombo,
@@ -22,6 +23,7 @@ router.get('/:id', obtenerComboPorId);
 // 👇 Aquí se usa upload.single('imagen')
 router.post('/', upload.single('imagen'), crearCombo);
 router.put('/:id', upload.single('imagen'), actualizarCombo);
+router.patch('/:id/favorito', actualizarFavoritoCombo);
 
 router.delete('/:id', eliminarCombo);
 

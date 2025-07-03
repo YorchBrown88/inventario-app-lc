@@ -18,6 +18,7 @@ const comboSchema = new mongoose.Schema({
   ],
   precioVenta: { type: Number, required: true },
   activo: { type: Boolean, default: true },
+  favorito: { type: Boolean, default: false }, // 👈 Agregado aquí correctamente
   imagen: {
     data: Buffer,
     contentType: String

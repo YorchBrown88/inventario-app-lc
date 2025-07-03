@@ -8,6 +8,7 @@ import {
   eliminarProducto
 } from '../controllers/productosController.js';
 import Producto from '../models/Producto.js'; // ✅ ESTA LÍNEA ES CLAVE
+import { actualizarFavorito } from '../controllers/productosController.js';
 
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.get('/', obtenerProductos);
 router.get('/disponibles', obtenerProductosDisponibles);
 router.post('/', upload.single('imagen'), crearProducto);
 router.put('/:id', upload.single('imagen'), actualizarProducto);
+router.patch('/:id/favorito', actualizarFavorito);
 router.delete('/:id', eliminarProducto);
 router.get('/:id', async (req, res) => {
   try {

@@ -14,6 +14,28 @@ function Productos() {
       });
   }, []);
   
+  const toggleFavoritoProducto = async (id, estadoActual) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos/${id}/favorito`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ favorito: !estadoActual })
+    });
+
+    if (!res.ok) throw new Error('Error al actualizar favorito');
+
+    const actualizado = await res.json();
+    setProductos(prev =>
+      prev.map(p => (p._id === actualizado._id ? actualizado : p))
+    );
+  } catch (err) {
+    console.error(err);
+    toast.error('No se pudo actualizar el favorito del producto');
+  }
+};
+
+
+
   const handleEliminar = async (id) => {
   if (!window.confirm('¿Seguro que deseas eliminar este producto?')) return;
 
@@ -58,7 +80,7 @@ function Productos() {
               <td className="p-2 border">
                 {producto.imagen ? (
                   <img
-                    src={`http://localhost:3000/uploads/${producto.imagen}`}
+                    src={`${import.meta.env.VITE_API_URL}/uploads/${producto.imagen}`}
                     alt={producto.nombre}
                     className="w-12 h-12 object-cover rounded"
                   />
@@ -68,27 +90,38 @@ function Productos() {
               </td>
               <td className="p-2 border">{producto.nombre}</td>
               <td className="p-2 border text-center">${producto.precioVenta?.toFixed(2)}</td>
+              
               <td className="p-2 border text-center space-x-2">
-                <Link
-                  to={`/productos/${producto._id}`}
-                  title="Ver">🔍
-                </Link>
+  <Link to={`/productos/${producto._id}`} title="Ver">🔍</Link>
 
-                <Link
-                  to={`/editar-producto/${producto._id}`}
-                  title="Editar"
-                  className="text-yellow-600 hover:text-yellow-800"
-                >
-                  ✏️
-                </Link>
-                <button
-                  title="Eliminar"
-                  className="text-red-600 hover:text-red-800"
-                  onClick={() => handleEliminar(producto._id)}
-                >
-                  🗑️
-                </button>
-              </td>
+  <Link
+    to={`/editar-producto/${producto._id}`}
+    title="Editar"
+    className="text-yellow-600 hover:text-yellow-800"
+  >
+    ✏️
+  </Link>
+
+  <button
+    title="Eliminar"
+    className="text-red-600 hover:text-red-800"
+    onClick={() => handleEliminar(producto._id)}
+  >
+    🗑️
+  </button>
+
+  <button
+    title={producto.favorito ? 'Quitar de favoritos' : 'Marcar como favorito'}
+    onClick={() => toggleFavoritoProducto(producto._id, producto.favorito)}
+    className={`hover:scale-110 transition-transform ${
+      producto.favorito ? 'text-yellow-500' : 'text-gray-400'
+    }`}
+  >
+    {producto.favorito ? '⭐' : '☆'}
+  </button>
+</td>
+
+              
             </tr>
           ))}
         </tbody>

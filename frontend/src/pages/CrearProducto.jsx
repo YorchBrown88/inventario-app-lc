@@ -38,7 +38,7 @@ function CrearProducto() {
     formData.append('nombre', nombre);
     formData.append('descripcion', descripcion);
     formData.append('precioVenta', parseFloat(precio));
-    if (imagen) formData.append('imagen', imagen); // ✅ agregar imagen
+    if (imagen) formData.append('imagen', imagen); 
 
     // Agregar los insumos como JSON string
     formData.append('insumos', JSON.stringify(
@@ -48,7 +48,7 @@ function CrearProducto() {
       }))
     ));
 
-    await crearProducto(formData); // Asegúrate que `crearProducto` use `fetch` con `body: formData`
+    await crearProducto(formData); 
     navigate('/productos');
   };
 

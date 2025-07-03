@@ -13,7 +13,7 @@ function EditarInsumo() {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/insumos/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`)
       .then((res) => res.json())
       .then((data) => setInsumo(data))
       .catch((err) => console.error("Error al cargar insumo:", err));
@@ -30,7 +30,7 @@ function EditarInsumo() {
     const { nombre, unidad, costoUnitario } = insumo;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/insumos/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, unidad, costoUnitario: parseFloat(costoUnitario) }),

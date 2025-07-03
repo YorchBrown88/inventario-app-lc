@@ -12,7 +12,7 @@ function PedidosEnCurso() {
       // Si hay un ID, traer solo el detalle del pedido
       const obtenerDetalle = async () => {
         try {
-          const res = await fetch(`http://localhost:3000/api/ventas/${id}`);
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ventas/${id}`);
           const data = await res.json();
           setPedido(data);
         } catch (error) {
@@ -24,7 +24,7 @@ function PedidosEnCurso() {
       // Si no hay ID, traer la lista de pedidos en curso
       const obtenerVentas = async () => {
         try {
-          const res = await fetch('http://localhost:3000/api/ventas/en-curso');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ventas/en-curso`);
           const data = await res.json();
           setVentas(data);
         } catch (error) {

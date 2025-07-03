@@ -7,7 +7,7 @@ function Reportes() {
   useEffect(() => {
     const obtenerReportes = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/reportes');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reportes`);
         const data = await res.json();
 
         if (Array.isArray(data)) {

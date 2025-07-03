@@ -18,7 +18,7 @@ const ClienteDetalle = () => {
 
   const obtenerCliente = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/clientes/${id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`);
       const data = await res.json();
       setCliente(data);
     } catch (error) {
@@ -28,7 +28,7 @@ const ClienteDetalle = () => {
 
   const obtenerVentas = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/ventas/cliente/${id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ventas/cliente/${id}`);
       const data = await res.json();
       setVentas(data);
       setVentasFiltradas(data); // mostrar todo al inicio

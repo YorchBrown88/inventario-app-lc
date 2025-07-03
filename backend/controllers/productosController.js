@@ -121,3 +121,25 @@ export const eliminarProducto = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar el producto' });
   }
 };
+
+export const actualizarFavorito = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { favorito } = req.body;
+
+    const producto = await Producto.findByIdAndUpdate(
+      id,
+      { favorito },
+      { new: true }
+    );
+
+    if (!producto) {
+      return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    }
+
+    res.json(producto);
+  } catch (error) {
+    console.error('Error actualizando favorito:', error);
+    res.status(500).json({ mensaje: 'Error al actualizar favorito' });
+  }
+};

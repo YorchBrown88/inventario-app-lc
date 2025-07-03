@@ -4,7 +4,7 @@ function PedidosCompletados() {
   const [pedidos, setPedidos] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/ventas/completados')
+    fetch(`${import.meta.env.VITE_API_URL}/api/ventas/completados`)
       .then(res => res.json())
       .then(data => setPedidos(data));
   }, []);

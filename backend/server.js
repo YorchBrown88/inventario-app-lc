@@ -47,9 +47,11 @@ app.use('/combos', comboRoutes); // debe estar así
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ Conectado a MongoDB');
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor disponible en http://0.0.0.0:${PORT}`);
     });
+
   })
   .catch((err) => {
     console.error('❌ Error conectando a MongoDB:', err);

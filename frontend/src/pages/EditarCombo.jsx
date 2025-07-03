@@ -88,7 +88,7 @@ function EditarCombo() {
     ));
 
     try {
-      await fetch(`http://localhost:3000/api/combos/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/combos/${id}`, {
         method: 'PUT',
         body: formData
       });

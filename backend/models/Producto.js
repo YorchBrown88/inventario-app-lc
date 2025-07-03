@@ -6,6 +6,7 @@ const productoSchema = new mongoose.Schema({
   imagen: String,
   precioVenta: { type: Number, required: true },
   precioProduccion: { type: Number, default: 0 },
+  favorito: { type: Boolean, default: false },
   insumos: [
     {
       insumo: { type: mongoose.Schema.Types.ObjectId, ref: 'Insumo', required: true },

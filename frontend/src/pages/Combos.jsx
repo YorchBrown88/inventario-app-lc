@@ -20,6 +20,28 @@ function Combos() {
     }
   };
 
+  const toggleFavorito = async (id, estadoActual) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/combos/${id}/favorito`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ favorito: !estadoActual })
+    });
+
+    if (!res.ok) throw new Error('Error al actualizar favorito');
+
+    // Recargar combos (puedes mejorar esto con solo actualizar el estado local)
+    const data = await res.json();
+    setCombos(prev =>
+      prev.map(c => (c._id === data._id ? data : c))
+    );
+    } catch (err) {
+      console.error(err);
+      toast.error('No se pudo actualizar el favorito');
+    }
+  };
+
+
   const eliminarCombo = async (id) => {
   const confirmar = confirm("¿Estás seguro de eliminar este combo?");
   if (!confirmar) return;
@@ -61,8 +83,8 @@ function Combos() {
               <tr>
                 <th className="p-2 border text-left">Nombre</th>
                 <th className="p-2 border text-center">Precio</th>
-                <th className="p-2 border text-center">Estado</th>
                 <th className="p-2 border text-center">Acciones</th>
+                <th className="p-2 border text-center"></th>
               </tr>
             </thead>
             <tbody>
@@ -70,9 +92,6 @@ function Combos() {
                 <tr key={combo._id} className="border-t hover:bg-gray-50">
                   <td className="p-2 border">{combo.nombre}</td>
                   <td className="p-2 border text-center">${combo.precioVenta?.toFixed(2)}</td>
-                  <td className="p-2 border text-center">
-                    {combo.activo ? "✅ Activo" : "❌ Inactivo"}
-                  </td>
                   <td className="p-2 border text-center space-x-2">
                     <button
                       className="text-blue-600 hover:text-blue-800"
@@ -95,6 +114,17 @@ function Combos() {
                     >
                       🗑️
                     </button>
+
+                  </td>
+                  <td className="border text-center">
+                    <button
+                    onClick={() => toggleFavorito(combo._id, combo.favorito)}
+                    className={`text-sm px-2 py-1 rounded ${
+                      combo.favorito ? 'bg-yellow-400 text-black' : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {combo.favorito ? '⭐' : '☆'}
+                  </button>
                   </td>
                 </tr>
               ))}

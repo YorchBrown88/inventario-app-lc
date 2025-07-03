@@ -17,7 +17,7 @@ const PedidoDetalle = () => {
 
   const fetchVenta = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/ventas/${id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ventas/${id}`);
       const data = await res.json();
       setVenta(data);
     } catch (error) {
@@ -34,7 +34,7 @@ const PedidoDetalle = () => {
       metodo: metodoPago,
     };
     try {
-      await fetch(`http://localhost:3000/api/ventas/${id}/pago-parcial`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/ventas/${id}/pago-parcial`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -77,18 +77,22 @@ const PedidoDetalle = () => {
         <h3 className="font-semibold mb-2">Productos</h3>
         <table className="w-full text-sm border">
           <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2 text-left">Producto</th>
-              <th className="border p-2 text-center">Cantidad</th>
-              <th className="border p-2 text-right">Precio Unitario</th>
-            </tr>
-          </thead>
+          <tr>
+            <th className="border p-2 text-left">Producto</th>
+            <th className="border p-2 text-center">Cantidad</th>
+            <th className="border p-2 text-right">Precio Unitario</th>
+            <th className="border p-2 text-right">Total</th> 
+          </tr>
+        </thead>
           <tbody>
             {venta.productos.map((p, i) => (
               <tr key={i}>
-                <td className="border p-2">{p.nombre}</td>
+                <td className="border p-2 text-left">{p.nombre || p.producto?.nombre || 'Sin nombre'}</td>
                 <td className="border p-2 text-center">{p.cantidad}</td>
                 <td className="border p-2 text-right">${p.precioUnitario.toFixed(2)}</td>
+                <td className="border p-2 text-right">
+                  ${(p.precioUnitario * p.cantidad).toFixed(2)} 
+                </td>
               </tr>
             ))}
           </tbody>

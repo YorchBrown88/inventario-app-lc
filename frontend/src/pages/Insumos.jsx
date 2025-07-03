@@ -14,7 +14,7 @@ const Insumos = () => {
   }, []);
 
   const obtenerInsumos = async () => {
-    const res = await fetch("http://localhost:3000/api/insumos");
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos`);
     const data = await res.json();
     setInsumos(data);
   };
@@ -24,13 +24,13 @@ const Insumos = () => {
     if (!formulario.nombre.trim()) return;
 
     if (editandoId) {
-      await fetch(`http://localhost:3000/api/insumos/${editandoId}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${editandoId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formulario),
       });
     } else {
-      await fetch("http://localhost:3000/api/insumos", {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/insumos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formulario, cantidad: 0 }),
@@ -54,31 +54,13 @@ const Insumos = () => {
   };
 
   const eliminarInsumo = async (id) => {
-  const confirmar = confirm('¿Estás seguro de que deseas eliminar este insumo?');
-  if (!confirmar) return;
-
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`, {
-      method: 'DELETE',
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      // Mensaje específico del backend
-      alert(data.mensaje || '❌ Error al eliminar el insumo');
-      return;
-    }
-
-    alert('✅ Insumo eliminado correctamente');
-    cargarInsumos(); // Asegúrate que esta función exista para refrescar la lista
-
-    } catch (error) {
-      console.error('Error al eliminar:', error);
-      alert('❌ Error del servidor al intentar eliminar el insumo');
+    if (confirm("¿Estás seguro de eliminar este insumo?")) {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`, {
+        method: "DELETE",
+      });
+      obtenerInsumos();
     }
   };
-
 
   const normalizar = (texto) =>
     texto

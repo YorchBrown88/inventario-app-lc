@@ -1,5 +1,6 @@
 import Combo from '../models/Combo.js';
 
+
 // Crear nuevo combo
 export const crearCombo = async (req, res) => {
   try {
@@ -103,5 +104,27 @@ export const eliminarCombo = async (req, res) => {
   } catch (error) {
     console.error('❌ Error al eliminar combo:', error);
     res.status(500).json({ error: 'Error al eliminar el combo' });
+  }
+};
+
+
+export const actualizarFavoritoCombo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { favorito } = req.body;
+
+    const combo = await Combo.findByIdAndUpdate(
+      id,
+      { favorito },
+      { new: true }
+    );
+
+    if (!combo) {
+      return res.status(404).json({ mensaje: 'Combo no encontrado' });
+    }
+
+    res.json(combo);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar favorito' });
   }
 };

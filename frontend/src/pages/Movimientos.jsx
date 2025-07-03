@@ -13,14 +13,14 @@ function MovimientoInventario() {
   const [mostrarTodos, setMostrarTodos] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/insumos')
+    fetch(`${import.meta.env.VITE_API_URL}/api/insumos`)
       .then(res => res.json())
       .then(data => setInsumos(data))
       .catch(err => console.error('Error al cargar insumos:', err));
   }, []);
 
   const cargarMovimientos = () => {
-    fetch('http://localhost:3000/api/movimientos')
+    fetch(`${import.meta.env.VITE_API_URL}/api/movimientos`)
       .then(res => res.json())
       .then(data => setMovimientos(data))
       .catch(err => console.error('Error al cargar movimientos:', err));
@@ -41,7 +41,7 @@ function MovimientoInventario() {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/api/movimientos', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/movimientos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosMovimiento)

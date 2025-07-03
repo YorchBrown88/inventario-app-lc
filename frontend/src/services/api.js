@@ -2,13 +2,13 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const obtenerInsumos = async () => {
-  const res = await fetch('http://localhost:3000/api/insumos');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos`);
   return res.json();
 };
 
 export const crearProducto = async (formData) => {
   try {
-    const res = await fetch('http://localhost:3000/api/productos', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`, {
       method: 'POST',
       body: formData, // ✅ sin JSON.stringify
     });
@@ -26,36 +26,36 @@ export const crearProducto = async (formData) => {
 };
 
 export const obtenerProductos = async () => {
-  const res = await fetch('http://localhost:3000/api/productos');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`);
   const data = await res.json();
   return data;
 };
 
 
 export async function obtenerProductosDisponibles() {
-  const res = await fetch('http://localhost:3000/api/productos/disponibles');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos/disponibles`);
   return await res.json();
 }
 
 export const obtenerVentas = async () => {
-  const res = await fetch('http://localhost:3000/api/ventas');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ventas`);
   return res.json();
 };
 
 export const obtenerReporteVentas = async () => {
-  const res = await fetch('http://localhost:3000/api/reportes/ventas');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reportes/ventas`);
   const data = await res.json();
   console.log("📊 Datos del reporte:", data);
   return data;
 };
 
 export const obtenerInsumoPorId = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/insumos/${id}`);
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`);
   return res.json();
 };
 
 export const actualizarInsumo = async (id, data) => {
-  const res = await fetch(`http://localhost:3000/api/insumos/${id}`, {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -70,13 +70,13 @@ export const obtenerMovimientos = async (filtros) => {
   if (filtros.desde) params.append("desde", filtros.desde);
   if (filtros.hasta) params.append("hasta", filtros.hasta);
 
-  const res = await fetch(`http://localhost:3000/api/movimientos?${params}`);
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/movimientos?${params}`);
   return await res.json();
 };
 
 export async function eliminarProducto(id) {
   try {
-    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos/${id}`, {
       method: 'DELETE',
     });
 
@@ -127,7 +127,7 @@ export const crearCombo = async (formData) => {
 };
 
 export const eliminarCombo = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/combos/${id}`, {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/combos/${id}`, {
     method: 'DELETE',
   });
 
