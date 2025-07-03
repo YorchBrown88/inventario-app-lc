@@ -54,13 +54,31 @@ const Insumos = () => {
   };
 
   const eliminarInsumo = async (id) => {
-    if (confirm("¿Estás seguro de eliminar este insumo?")) {
-      await fetch(`http://localhost:3000/api/insumos/${id}`, {
-        method: "DELETE",
-      });
-      obtenerInsumos();
+  const confirmar = confirm('¿Estás seguro de que deseas eliminar este insumo?');
+  if (!confirmar) return;
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id}`, {
+      method: 'DELETE',
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Mensaje específico del backend
+      alert(data.mensaje || '❌ Error al eliminar el insumo');
+      return;
+    }
+
+    alert('✅ Insumo eliminado correctamente');
+    cargarInsumos(); // Asegúrate que esta función exista para refrescar la lista
+
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      alert('❌ Error del servidor al intentar eliminar el insumo');
     }
   };
+
 
   const normalizar = (texto) =>
     texto

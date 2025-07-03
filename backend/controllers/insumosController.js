@@ -1,4 +1,5 @@
 import Insumo from '../models/Insumo.js';
+import Producto from '../models/Producto.js';
 
 export const obtenerInsumos = async (req, res) => {
   const insumos = await Insumo.find();
@@ -19,6 +20,21 @@ export const actualizarInsumo = async (req, res) => {
 
 export const eliminarInsumo = async (req, res) => {
   const { id } = req.params;
-  await Insumo.findByIdAndDelete(id);
-  res.json({ mensaje: 'Insumo eliminado' });
+
+  try {
+    // Validar si el insumo está siendo usado en algún producto
+    const productoConInsumo = await Producto.findOne({ 'insumos.insumo': id });
+
+    if (productoConInsumo) {
+      return res.status(400).json({ mensaje: '❌ No se puede eliminar el insumo porque está siendo utilizado en un producto.' });
+    }
+
+    // Si no está en uso, eliminar
+    await Insumo.findByIdAndDelete(id);
+    res.json({ mensaje: '✅ Insumo eliminado correctamente' });
+
+  } catch (error) {
+    console.error('Error al eliminar insumo:', error);
+    res.status(500).json({ mensaje: '❌ Error al eliminar el insumo' });
+  }
 };

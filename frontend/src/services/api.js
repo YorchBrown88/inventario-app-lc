@@ -106,6 +106,13 @@ export async function obtenerCombos() {
   }
 }
 
+export const obtenerComboPorId = async (id) => {
+  const res = await fetch(`${API_URL}/combos/${id}`);
+  if (!res.ok) throw new Error('Error al obtener combo');
+  return res.json();
+};
+
+
 export const crearCombo = async (formData) => {
   const res = await fetch(`${API_URL}/api/combos`, {
     method: 'POST',

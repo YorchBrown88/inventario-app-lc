@@ -1,5 +1,5 @@
-import Venta from '../models/venta.js';
-import Cliente from '../models/cliente.js';
+import Venta from '../models/Venta.js';
+import Cliente from '../models/Cliente.js';
 
 export const registrarVenta = async (req, res) => {
   try {

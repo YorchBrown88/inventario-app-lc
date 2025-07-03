@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -12,17 +12,17 @@ const Clientes = () => {
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const cargarClientes = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes?todos=${mostrarInactivos}`);
-        const data = await res.json();
-        setClientes(data);
-      } catch (err) {
-        setMensaje('❌ Error cargando clientes');
-      }
-    };
+  const cargarClientes = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes?todos=${mostrarInactivos}`);
+      const data = await res.json();
+      setClientes(data);
+    } catch (err) {
+      setMensaje('❌ Error cargando clientes');
+    }
+  };
 
+  useEffect(() => {
     cargarClientes();
   }, [mostrarInactivos]);
 
@@ -60,7 +60,8 @@ const Clientes = () => {
       setCliente({ nombre: '', cedula: '', correo: '', telefono: '', direccion: '' });
       setEditandoId(null);
       setMostrarFormulario(false);
-      setMostrarInactivos(false); // recarga solo los activos después de guardar
+      setMostrarInactivos(false);
+      cargarClientes();
     } catch (error) {
       setMensaje('❌ Error de conexión con el servidor');
     }
@@ -72,38 +73,26 @@ const Clientes = () => {
     setMostrarFormulario(true);
   };
 
-  const manejarEliminar = async (id) => {
-    if (confirm('¿Seguro que deseas eliminar este cliente?')) {
-      try {
-        await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`, { method: 'DELETE' });
-        setMostrarInactivos(false);
-      } catch (error) {
-        setMensaje('❌ Error al eliminar cliente');
+  const toggleActivo = async (id, estadoActual) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activo: !estadoActual })
+      });
+
+      if (!res.ok) {
+        setMensaje('❌ No se pudo cambiar el estado');
+        return;
       }
+
+      setMensaje(`✅ Cliente ${estadoActual ? 'inactivado' : 'activado'}`);
+      setTimeout(() => setMensaje(''), 2000);
+      cargarClientes();
+    } catch (error) {
+      setMensaje('❌ Error de conexión con el servidor');
     }
   };
-
-  const toggleActivo = async (id, estadoActual) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/clientes/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ activo: !estadoActual })
-    });
-
-    if (!res.ok) {
-      setMensaje('❌ No se pudo cambiar el estado');
-      return;
-    }
-
-    setMensaje(`✅ Cliente ${estadoActual ? 'inactivado' : 'activado'}`);
-    setTimeout(() => setMensaje(''), 2000);
-    cargarClientes();
-  } catch (error) {
-    setMensaje('❌ Error de conexión con el servidor');
-  }
-};
-
 
   const normalizar = (texto) =>
     texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -120,23 +109,36 @@ const Clientes = () => {
     <div className="p-4 max-w-5xl mx-auto">
       {mensaje && <p className="mb-4 text-green-700 font-medium">{mensaje}</p>}
 
-      <button
-        onClick={() => {
-          setMostrarFormulario(!mostrarFormulario);
-          setCliente({ nombre: '', cedula: '', correo: '', telefono: '', direccion: '' });
-          setEditandoId(null);
-        }}
-        className="mb-4 bg-green-600 text-white px-4 py-2 rounded"
-      >
-        {mostrarFormulario ? 'Cancelar' : '➕ Agregar nuevo cliente'}
-      </button>
+      {/* Encabezado con botones y buscador */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => {
+              setMostrarFormulario(!mostrarFormulario);
+              setCliente({ nombre: '', cedula: '', correo: '', telefono: '', direccion: '' });
+              setEditandoId(null);
+            }}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+          >
+            <FaPlus /> {mostrarFormulario ? 'Cancelar' : 'Agregar nuevo cliente'}
+          </button>
 
-      <button
-        onClick={() => setMostrarInactivos(!mostrarInactivos)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
-      >
-        {mostrarInactivos ? 'Ocultar Inactivos' : 'Mostrar Inactivos'}
-      </button>
+          <button
+            onClick={() => setMostrarInactivos(!mostrarInactivos)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            {mostrarInactivos ? 'Ocultar Inactivos' : 'Mostrar Inactivos'}
+          </button>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Buscar por nombre o cédula..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="border px-4 py-2 rounded w-full sm:w-1/3"
+        />
+      </div>
 
       {mostrarFormulario && (
         <form
@@ -170,14 +172,7 @@ const Clientes = () => {
         </form>
       )}
 
-      <input
-        type="text"
-        placeholder="Buscar por nombre o cédula..."
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        className="border p-2 mb-4 rounded w-full sm:w-1/2"
-      />
-
+      {/* Tabla de clientes */}
       <table className="w-full text-sm border rounded overflow-hidden">
         <thead className="bg-gray-200">
           <tr>
@@ -188,34 +183,32 @@ const Clientes = () => {
           </tr>
         </thead>
         <tbody>
-
           {clientesFiltrados
-          .filter((cli) => cli.activo === !mostrarInactivos) // filtra por activos o inactivos según el botón
-          .map((cli) => (
-            <tr key={cli._id} className="border-t text-center">
-              <td className="p-2 text-left">{cli.nombre}</td>
-              <td className="p-2">{ocultarCedula(cli.cedula)}</td>
-              <td className="p-2">${(cli.ticketPromedio || 0).toFixed(2)}</td>
-              <td className="p-2">
-                <div className="flex justify-center gap-3 items-center">
-                  <button onClick={() => navigate(`/clientes/${cli._id}`)} className="text-blue-600">
-                    <FaEye />
-                  </button>
-                  <button onClick={() => manejarEditar(cli)} className="text-yellow-500">
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => toggleActivo(cli._id, cli.activo)}
-                    className={cli.activo ? 'text-red-600' : 'text-green-600'}
-                    title={cli.activo ? 'Inactivar' : 'Activar'}
-                  >
-                    {cli.activo ? '❌' : '✅'}
-                  </button>
-                </div>
-              </td>
-            </tr>
-        ))}
-
+            .filter((cli) => cli.activo === !mostrarInactivos)
+            .map((cli) => (
+              <tr key={cli._id} className="border-t text-center">
+                <td className="p-2 text-left">{cli.nombre}</td>
+                <td className="p-2">{ocultarCedula(cli.cedula)}</td>
+                <td className="p-2">${(cli.ticketPromedio || 0).toFixed(2)}</td>
+                <td className="p-2">
+                  <div className="flex justify-center gap-3 items-center">
+                    <button onClick={() => navigate(`/clientes/${cli._id}`)} className="text-blue-600">
+                      <FaEye />
+                    </button>
+                    <button onClick={() => manejarEditar(cli)} className="text-yellow-500">
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => toggleActivo(cli._id, cli.activo)}
+                      className={cli.activo ? 'text-red-600' : 'text-green-600'}
+                      title={cli.activo ? 'Inactivar' : 'Activar'}
+                    >
+                      {cli.activo ? '❌' : '✅'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

@@ -16,7 +16,7 @@ function EditarProducto() {
         const data = await res.json();
 
         const insumosFormateados = data.insumos.map(item => ({
-          insumoId: item.insumo._id,
+          insumoId: item.insumo?._id || item.insumoId || item.insumo,
           cantidad: item.cantidad
         }));
 
@@ -24,7 +24,8 @@ function EditarProducto() {
           ...data,
           insumos: insumosFormateados
         });
-      } catch {
+      } catch (err) {
+        console.error(err);
         setError('Error al cargar producto');
       }
     };
@@ -141,11 +142,11 @@ function EditarProducto() {
         <div>
           <p className="mb-1">Imagen actual:</p>
           {producto.imagen && (
-          <img
-            src={`${import.meta.env.VITE_API_URL}/uploads/${producto.imagen}`}
-            alt="Imagen del producto"
-            className="w-24 h-24 object-cover mb-2 rounded"
-          />
+            <img
+              src={`${import.meta.env.VITE_API_URL}/uploads/${producto.imagen}`}
+              alt="Imagen del producto"
+              className="w-24 h-24 object-cover mb-2 rounded"
+            />
           )}
           <input
             type="file"
@@ -177,10 +178,20 @@ function EditarProducto() {
                 onChange={e => handleInsumoChange(i, 'cantidad', e.target.value)}
                 className="w-1/3 border px-2 py-1 rounded"
               />
-              <button type="button" onClick={() => eliminarInsumo(i)} className="text-red-500 font-bold">✖</button>
+              <button
+                type="button"
+                onClick={() => eliminarInsumo(i)}
+                className="text-red-500 font-bold"
+              >
+                ✖
+              </button>
             </div>
           ))}
-          <button type="button" onClick={agregarInsumo} className="text-sm text-blue-600 hover:underline">
+          <button
+            type="button"
+            onClick={agregarInsumo}
+            className="text-sm text-blue-600 hover:underline"
+          >
             + Agregar Insumo
           </button>
         </div>

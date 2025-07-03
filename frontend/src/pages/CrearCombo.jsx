@@ -36,41 +36,39 @@ function CrearCombo() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (seleccionados.length === 0) {
-    toast.warning("Debes agregar al menos un producto");
-    return;
-  }
+    if (seleccionados.length === 0) {
+      toast.warning("Debes agregar al menos un producto");
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append('nombre', nombre);
-  formData.append('descripcion', descripcion);
-  formData.append('precioVenta', parseFloat(precio));
-  formData.append('activo', activo);
-  if (imagen) formData.append('imagen', imagen);
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('descripcion', descripcion);
+    formData.append('precioVenta', parseFloat(precio));
+    formData.append('activo', activo);
+    if (imagen) formData.append('imagen', imagen);
 
-  formData.append('productos', JSON.stringify(
-    seleccionados.map(item => ({
-      productoId: item.productoId,
-      cantidad: parseFloat(item.cantidad)
-    }))
-  ));
+    formData.append('productos', JSON.stringify(
+      seleccionados.map(item => ({
+        productoId: item.productoId,
+        cantidad: parseFloat(item.cantidad)
+      }))
+    ));
 
-  // 👇 ESTE BLOQUE IMPRIME TODO LO QUE SE ESTÁ ENVIANDO
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
-  try {
-    await crearCombo(formData);
-    toast.success("Combo creado exitosamente");
-    navigate('/combos');
-  } catch {
-    toast.error("Error al crear el combo");
-  }
-};
-
+    try {
+      await crearCombo(formData);
+      toast.success("Combo creado exitosamente");
+      navigate('/combos');
+    } catch {
+      toast.error("Error al crear el combo");
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-4">

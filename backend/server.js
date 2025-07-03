@@ -9,9 +9,17 @@ import movimientosRoutes from './routes/movimientos.js';
 import clientesRoutes from './routes/clientes.js';
 import reportesRoutes from './routes/reportes.js';
 import combosRoutes from './routes/combos.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import comboRoutes from './routes/combos.js';
+
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -30,6 +38,7 @@ app.use('/api/ventas', ventasRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/combos', combosRoutes);
+app.use('/combos', comboRoutes); // debe estar así
 
 // Ya no necesitas esta línea duplicada ni con require (ELIMINAR):
 // app.use('/productos', require('./routes/productos'));
